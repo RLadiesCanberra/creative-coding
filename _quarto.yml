@@ -14,7 +14,7 @@ website:
       - getting-started.qmd
       - truchet-tiles.qmd
   margin-header: |
-    ![](/images/ANU_Secondary_Horizontal_GoldBlack.png)
+    ![](/images/rladies-canberra-logo.png)
 
 format:
   html:

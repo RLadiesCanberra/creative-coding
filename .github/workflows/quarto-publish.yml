@@ -29,6 +29,7 @@ jobs:
           extra-packages: |
             any::ggplot2
             any::rmarkdown
+            any::ggforce
           needs: |
             website
       
