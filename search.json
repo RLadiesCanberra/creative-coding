@@ -1,10 +1,59 @@
 [
   {
+    "objectID": "truchet-tiles.html",
+    "href": "truchet-tiles.html",
+    "title": "Truchet tiles",
+    "section": "",
+    "text": "library(tidyverse)\ntheme_set(theme_void() + theme(legend.position = \"none\"))"
+  },
+  {
+    "objectID": "truchet-tiles.html#triangle-tiles",
+    "href": "truchet-tiles.html#triangle-tiles",
+    "title": "Truchet tiles",
+    "section": "Triangle tiles",
+    "text": "Triangle tiles\n\n# set up the tiles data\ntile1 &lt;- tibble(x = c(0, 0, 1, 0, 1, 1, 0, 1),\n                y = c(0, 1, 0, 0, 0, 1, 1, 0),\n                g = factor(rep(1:2, each = 4)),\n                tile = \"tile1\")\ntile2 &lt;- tibble(x = c(0, 0, 1, 0, 0, 1, 1, 0),\n                y = c(0, 1, 1, 0, 0, 1, 0, 0),\n                g = factor(rep(1:2, each = 4)),\n                tile = \"tile2\")\n# the next two tiles just reverse color\ntile3 &lt;- tile1 %&gt;% \n  mutate(g = factor(rep(2:1, each = 4)),\n         tile = \"tile3\")\ntile4 &lt;- tile2 %&gt;% \n  mutate(g = factor(rep(2:1, each = 4)),\n         tile = \"tile4\")\n\nset.seed(20231030)\ngtile &lt;- ggplot(tile1, aes(x, y)) +\n  geom_polygon(aes(fill = g, group = g), color = \"black\", linewidth = 2) + \n  coord_equal() + \n  # sample two colors randomly\n  scale_fill_manual(values = sample(colors(), 2))\n\ngtile\n\n\n\n\n\n\n\ngtile %+% tile2\n\n\n\n\n\n\n\ngtile %+% tile3\n\n\n\n\n\n\n\ngtile %+% tile4\n\n\n\n\n\n\n\n\nNow let’s make 10 x 10 times grid with these tiles!\n\nmygrid &lt;- expand_grid(row = 0:9, col = 0:9) %&gt;% \n  mutate(tile_id = 1:n()) %&gt;% \n  rowwise() %&gt;% \n  mutate(tile = sample(c(\"tile1\", \"tile2\", \"tile3\", \"tile4\"), 1)) %&gt;% \n  full_join(bind_rows(tile1, tile2, tile3, tile4), by = \"tile\") %&gt;% \n  mutate(x = col + x,\n         y = row + y)\n\nmygrid\n\n# A tibble: 800 × 7\n# Rowwise: \n     row   col tile_id tile      x     y g    \n   &lt;int&gt; &lt;int&gt;   &lt;int&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;fct&gt;\n 1     0     0       1 tile3     0     0 2    \n 2     0     0       1 tile3     0     1 2    \n 3     0     0       1 tile3     1     0 2    \n 4     0     0       1 tile3     0     0 2    \n 5     0     0       1 tile3     1     0 1    \n 6     0     0       1 tile3     1     1 1    \n 7     0     0       1 tile3     0     1 1    \n 8     0     0       1 tile3     1     0 1    \n 9     0     1       2 tile4     1     0 2    \n10     0     1       2 tile4     1     1 2    \n# ℹ 790 more rows\n\n\n\nggplot(mygrid, aes(x, y)) +\n  geom_polygon(aes(group = paste(tile_id, g), fill = g), color = \"black\", linewidth = 2) + \n  coord_equal() + \n  # sample two colors randomly\n  scale_fill_manual(values = sample(colors(), 2))"
+  },
+  {
+    "objectID": "truchet-tiles.html#arc-tiles",
+    "href": "truchet-tiles.html#arc-tiles",
+    "title": "Truchet tiles",
+    "section": "Arc tiles",
+    "text": "Arc tiles\n\nlibrary(ggforce)\ntile1 &lt;- tibble(x0 = 1,\n                y0 = 0,\n                r0 = 0.5,\n                start = 0,\n                end = pi/2)\n\nggplot(tile1, aes(x0, y0)) +\n  geom_arc_bar(aes(x0 = x0, y0 = y0, r0 = r0, r = 0.6, start = start, end = end)) \n\n\n\n\n\n\n\narcs &lt;- data.frame(\n  start = seq(0, 2 * pi, length.out = 11)[-11],\n  end = seq(0, 2 * pi, length.out = 11)[-1],\n  r = rep(1:2, 5)\n)\n\n# Behold the arcs\nggplot(arcs) +\n  geom_arc_bar(aes(x0 = 0, y0 = 0, r0 = r - 1, r = r, start = start,\n                   end = end, fill = r)) + \n  coord_equal()"
+  },
+  {
     "objectID": "getting-started.html",
     "href": "getting-started.html",
     "title": "Getting started",
     "section": "",
     "text": "This quick start guide is largely inspired from the excellent workshop by Danielle Navarro.\n\nlibrary(tidyverse)\n# let's remove any labels and scales\ntheme_set(theme_void() + theme(legend.position = \"none\"))\n\n\n\n(Optional) recording the making of the plot\n\n\nlibrary(camcorder) # optional! For getting the gif at the end.\ngg_record(\n  dir = file.path(tempdir(), \"recording\"), # where to save the recording\n  device = \"jpeg\", # device to use to save images\n  width = 4,      # width of saved image\n  height = 4,     # height of saved image\n  units = \"in\",   # units for width and height\n  dpi = 300       # dpi to use when saving image\n)\n\n\nStart with any data you like, but we are going to plot the data in the mtcars dataset. We can start with some simple scatter plot.\n\nggplot(mtcars, aes(wt, disp, color = factor(am))) + \n  geom_point(size = 5) +\n  scale_color_manual(values = c(\"skyblue\", \"orange\"))\n\n\n\n\n\n\n\n\nNow let’s have some fun!\n\ng1 &lt;- ggplot(mtcars, aes(wt, disp))  +\n  geom_segment(aes(xend = 0, yend = 0, linewidth = hp)) +\n  geom_point(size = 5, color = \"black\", aes(wt - 0.02, disp - 1)) +\n  geom_point(aes(color = factor(am)), size = 5) +\n  scale_color_manual(values = c(\"skyblue\", \"orange\")) +\n  scale_linewidth_continuous(range = c(0.05, 1))\n\ng1\n\n\n\n\n\n\n\n\n\ng1 + coord_polar()\n\n\n\n\n\n\n\n\n\ng1 + \n  coord_polar(\"y\") +\n  annotate(\"point\", size = 20, x = 0, y = 0) +\n  annotate(\"point\", size = 3, x = 0.5, y = 1, color = \"white\") \n\n\n\n\n\n\n\n\n\n\nCode to create gif\ngg_playback(\n  name = \"getting-started.gif\",\n  first_image_duration = 5,\n  last_image_duration = 15,\n  frame_duration = .7,\n  image_resize = 600\n)"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "The goal of this creative coding workshop is so that we can create a space where we (at ANU) can commune to discuss coding while having some fun with art. If this workshop is successful, there may be opportunities to repeat this in the future and in essence, create a community where creative coders can connect. We would also love to showcase the generative art you create on this website!\nWhile the primary materials are geared towards those who are proficient in R, those who want to come and join are welcomed!"
+  },
+  {
+    "objectID": "about.html#mental-health-awareness-month",
+    "href": "about.html#mental-health-awareness-month",
+    "title": "About",
+    "section": "Mental Health Awareness Month",
+    "text": "Mental Health Awareness Month\nMental Health Awareness Month is a Month dedicated to raising awareness of the risk factors for Mental Health Conditions and the connections between mental and physical health. One of the key focuses during this month is to bring awareness to noticing signs of mental health conditions as they arise, letting people know how and who they can ask for help, and giving people ideas and resources on how to maintain their mental health. Whilst Mental Health Awareness month is just one month of the year, the things you can learn during the month can be used and practiced throughout the year.\nFor more details see the College of Science intranet on wellbeing."
+  },
+  {
+    "objectID": "about.html#acknowledgement",
+    "href": "about.html#acknowledgement",
+    "title": "About",
+    "section": "Acknowledgement",
+    "text": "Acknowledgement\nThank you to Nat Thomas, Senior Advisor for Diversity and Culture at CoS, for booking us the room and organising the afternoon tea for this activity.\nThis website is built using Quarto and hosted using GitHub pages. All code to make this website can be found here."
+  },
+  {
+    "objectID": "about.html#formal-study",
+    "href": "about.html#formal-study",
+    "title": "About",
+    "section": "Formal study",
+    "text": "Formal study\nFor those interested in formal study about creative coding, you may want to check out the following courses:\n\nFoundations of Creative Code DESN2002 or DESN6002\nArt and Interaction Computing COMP1720"
   },
   {
     "objectID": "index.html",
@@ -26,26 +75,5 @@
     "title": "Creative Coding",
     "section": "aRt",
     "text": "aRt\nBy Elle Saber\n\n\nCode\nlibrary(tidyverse)\ntheme_set(theme_void() + theme(legend.position = \"none\"))\nset.seed(1)\n\nn &lt;- 100\n\nsegments.dat &lt;- tibble(\n  x0 = rnorm(n, 50, 20),\n  y0 = rt(n, df = 10),\n  x1 = x0 + runif(n, min = 0, max = 10),\n  y1 = y0 + runif(n, min = 0, max = 1),\n  shade = runif(n), \n  size = runif(n)\n)\n\ncurly.dat &lt;- tibble(x = seq(1, 120, by=.2),\n                    ysin = sin(x))\n\n\nmiddle.dat &lt;- tibble(x = runif(100, 1, 100), \n                     y = rnorm(100))\n\nggplot() + \n  geom_segment(data = middle.dat, aes(x,y, xend=0, yend =0), colour = \"deepskyblue3\", alpha=.5, size = 5)+\n  geom_segment(data = segments.dat, aes(x = x0, y = y0,\n                                        xend = x1, yend = y1,\n                                        colour = shade, size = size )) + \n  scale_color_viridis_c(option = \"magma\") + \n  geom_polygon(data = curly.dat, aes(x, ysin), fill = \"violetred\", alpha=.5) + \n  coord_polar() \n\n\n\n\n\n\n\n\n\nBy Erin Walsh\n\n\nCode\n########################## Rtist workshop 30/10/2023 ##########################\n## Playing with Truchet tiles exercise\n## erin.walsh@anu.edu.au\n\nlibrary(ggplot2)\nlibrary(gridExtra)\n\ngconst &lt;- factor(rep(1:2, each = 4))\nposs_seqs &lt;- sample(c(0,1), size = 8, replace = TRUE)\n\nrand_tile &lt;- function(seed=1,num=1){set.seed(seed)\n  data.frame(x = sample(c(0,1), size = 8, replace = TRUE),\n         y = sample(c(0,1), size = 8, replace = TRUE),\n         g = factor(rep(1:2, each = 4)),\n         title = paste0(\"tile\",num))}\n\n\ntheme_set(theme_void() + theme(legend.position = \"none\"))\n\nplot_tile &lt;- function(dat){\n  ggplot(dat, aes(x, y)) +\n    geom_polygon(aes(group = paste(title, g), fill = g), \n                 color = sample(c(\"#9B5DE5\",\"#F15BB5\",\"#FEE440\",\"#00BBF9\",\"#00F5D4\"),1), \n                 linewidth = 1) + \n    coord_equal() + \n    ## sample two colors randomly\n    #scale_fill_manual(values = sample(colors(), 2))\n    scale_fill_manual(values = sample(c(\"#9B5DE5\",\"#F15BB5\",\"#FEE440\",\"#00BBF9\",\"#00F5D4\"),2))\n}\n\n\n\nmany_rows &lt;- 8\nmany_cols &lt;- 8\n\naccum &lt;- list()\nfor(i in 1:(many_rows*many_cols)){accum[[i]] &lt;- plot_tile(rand_tile(i,i))}\n\ndo.call(grid.arrange, accum)"
-  },
-  {
-    "objectID": "truchet-tiles.html",
-    "href": "truchet-tiles.html",
-    "title": "Truchet tiles",
-    "section": "",
-    "text": "library(tidyverse)\ntheme_set(theme_void() + theme(legend.position = \"none\"))"
-  },
-  {
-    "objectID": "truchet-tiles.html#triangle-tiles",
-    "href": "truchet-tiles.html#triangle-tiles",
-    "title": "Truchet tiles",
-    "section": "Triangle tiles",
-    "text": "Triangle tiles\n\n# set up the tiles data\ntile1 &lt;- tibble(x = c(0, 0, 1, 0, 1, 1, 0, 1),\n                y = c(0, 1, 0, 0, 0, 1, 1, 0),\n                g = factor(rep(1:2, each = 4)),\n                tile = \"tile1\")\ntile2 &lt;- tibble(x = c(0, 0, 1, 0, 0, 1, 1, 0),\n                y = c(0, 1, 1, 0, 0, 1, 0, 0),\n                g = factor(rep(1:2, each = 4)),\n                tile = \"tile2\")\n# the next two tiles just reverse color\ntile3 &lt;- tile1 %&gt;% \n  mutate(g = factor(rep(2:1, each = 4)),\n         tile = \"tile3\")\ntile4 &lt;- tile2 %&gt;% \n  mutate(g = factor(rep(2:1, each = 4)),\n         tile = \"tile4\")\n\nset.seed(20231030)\ngtile &lt;- ggplot(tile1, aes(x, y)) +\n  geom_polygon(aes(fill = g, group = g), color = \"black\", linewidth = 2) + \n  coord_equal() + \n  # sample two colors randomly\n  scale_fill_manual(values = sample(colors(), 2))\n\ngtile\n\n\n\n\n\n\n\ngtile %+% tile2\n\n\n\n\n\n\n\ngtile %+% tile3\n\n\n\n\n\n\n\ngtile %+% tile4\n\n\n\n\n\n\n\n\nNow let’s make 10 x 10 times grid with these tiles!\n\nmygrid &lt;- expand_grid(row = 0:9, col = 0:9) %&gt;% \n  mutate(tile_id = 1:n()) %&gt;% \n  rowwise() %&gt;% \n  mutate(tile = sample(c(\"tile1\", \"tile2\", \"tile3\", \"tile4\"), 1)) %&gt;% \n  full_join(bind_rows(tile1, tile2, tile3, tile4), by = \"tile\") %&gt;% \n  mutate(x = col + x,\n         y = row + y)\n\nmygrid\n\n# A tibble: 800 × 7\n# Rowwise: \n     row   col tile_id tile      x     y g    \n   &lt;int&gt; &lt;int&gt;   &lt;int&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;fct&gt;\n 1     0     0       1 tile3     0     0 2    \n 2     0     0       1 tile3     0     1 2    \n 3     0     0       1 tile3     1     0 2    \n 4     0     0       1 tile3     0     0 2    \n 5     0     0       1 tile3     1     0 1    \n 6     0     0       1 tile3     1     1 1    \n 7     0     0       1 tile3     0     1 1    \n 8     0     0       1 tile3     1     0 1    \n 9     0     1       2 tile4     1     0 2    \n10     0     1       2 tile4     1     1 2    \n# ℹ 790 more rows\n\n\n\nggplot(mygrid, aes(x, y)) +\n  geom_polygon(aes(group = paste(tile_id, g), fill = g), color = \"black\", linewidth = 2) + \n  coord_equal() + \n  # sample two colors randomly\n  scale_fill_manual(values = sample(colors(), 2))"
-  },
-  {
-    "objectID": "truchet-tiles.html#arc-tiles",
-    "href": "truchet-tiles.html#arc-tiles",
-    "title": "Truchet tiles",
-    "section": "Arc tiles",
-    "text": "Arc tiles\n\nlibrary(ggforce)\ntile1 &lt;- tibble(x0 = 1,\n                y0 = 0,\n                r0 = 0.5,\n                start = 0,\n                end = pi/2)\n\nggplot(tile1, aes(x0, y0)) +\n  geom_arc_bar(aes(x0 = x0, y0 = y0, r0 = r0, r = 0.6, start = start, end = end)) \n\n\n\n\n\n\n\narcs &lt;- data.frame(\n  start = seq(0, 2 * pi, length.out = 11)[-11],\n  end = seq(0, 2 * pi, length.out = 11)[-1],\n  r = rep(1:2, 5)\n)\n\n# Behold the arcs\nggplot(arcs) +\n  geom_arc_bar(aes(x0 = 0, y0 = 0, r0 = r - 1, r = r, start = start,\n                   end = end, fill = r)) + \n  coord_equal()"
   }
 ]
