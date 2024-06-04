@@ -17,3 +17,5 @@ Imports:
     gridExtra
 Depends: 
     tidyverse
+URL: https://github.com/RLadiesCanberra/creative-coding
+BugReports: https://github.com/RLadiesCanberra/creative-coding/issues
