@@ -1,24 +1,27 @@
 /* css styles */
 
+.navbar {
+  background-color: #88398a;
+}
 
 
 .navbar-dark {
-    background-color: #BE830E;
+    background-color: #88398a;
 }
 
 a {
-  color: #BE830E;
+  color: #88398a;
 }
 
 a:hover { color: black; }
 
 .sidebar nav[role=doc-toc] ul>li>a.active, .sidebar nav[role=doc-toc] ul>li>ul>li>a.active {
-  color: #BE830E!important;
-  border-left: 1px solid #BE830E!important;
+  color: #88398a!important;
+  border-left: 1px solid #88398a!important;
 }
 
 div.callout-note.callout {
-    border-left-color: #BE830E;
+    border-left-color: #88398a;
 }
 
 div.callout-note.callout-titled .callout-icon::before {
