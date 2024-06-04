@@ -1,0 +1,120 @@
+---
+title: "Creative Coding"
+subtitle: Make generative art with R
+---
+
+
+R is a programming language used widely for data analysis, but in this workshop, we will explore ways to make art! 
+
+::: callout-warning
+
+## Prerequisite
+ 
+Please note that you are expected to be proficient in R and some knowledge of tidyverse or ggplot2 as we do not have time to cover the basics in this workshop. Participants are expected also to bring their own laptops with R installed.
+
+:::
+
+If you need a **refresher for using `ggplot2`**, check out this online chapter [here](https://learnr.numbat.space/chapter6).
+
+We will use the following materials for inspiration:
+
+- **Art from code** by Danielle Navarro [{{< fa link >}}](https://art-from-code.netlify.app/) [{{< fa brands github >}}](https://github.com/rstudio-conf-2022/art-from-code)
+- **Steal like an Rtist: Creative Coding in R** by Ijeamaka Anyene Fumagalli and Sharla Gelfand [{{< fa brands github >}}](https://github.com/posit-conf-2023/creative-coding)
+
+
+
+## Sharing your artwork
+
+Please upload your artwork (and optionally your code to generate the artwork) [here](https://www.dropbox.com/request/DRq48DNRGU9mhpI2MZDd). Your name (based on your input) will be included in the display. 
+
+Alternatively, if you are proficient in Git/GitHub and Quarto, then you are welcomed to do a pull request directly to the [repo that hosts this website](https://github.com/anu-links/creative-coding). 
+
+Please note that the link expires at 30th Nov 2023. Beyond this date or there are other matters, please get in touch with Emi Tanaka (emi.tanaka@anu.edu.au) to display your artwork. 
+
+## aRt
+
+By *Elle Saber*
+
+```{r}
+#| code-fold: true
+#| warning: false
+library(tidyverse)
+theme_set(theme_void() + theme(legend.position = "none"))
+set.seed(1)
+
+n <- 100
+
+segments.dat <- tibble(
+  x0 = rnorm(n, 50, 20),
+  y0 = rt(n, df = 10),
+  x1 = x0 + runif(n, min = 0, max = 10),
+  y1 = y0 + runif(n, min = 0, max = 1),
+  shade = runif(n), 
+  size = runif(n)
+)
+
+curly.dat <- tibble(x = seq(1, 120, by=.2),
+                    ysin = sin(x))
+
+
+middle.dat <- tibble(x = runif(100, 1, 100), 
+                     y = rnorm(100))
+
+ggplot() + 
+  geom_segment(data = middle.dat, aes(x,y, xend=0, yend =0), colour = "deepskyblue3", alpha=.5, size = 5)+
+  geom_segment(data = segments.dat, aes(x = x0, y = y0,
+                                        xend = x1, yend = y1,
+                                        colour = shade, size = size )) + 
+  scale_color_viridis_c(option = "magma") + 
+  geom_polygon(data = curly.dat, aes(x, ysin), fill = "violetred", alpha=.5) + 
+  coord_polar() 
+```
+
+By *Erin Walsh*
+
+
+```{r}
+#| code-fold: true
+#| warning: false
+########################## Rtist workshop 30/10/2023 ##########################
+## Playing with Truchet tiles exercise
+## erin.walsh@anu.edu.au
+
+library(ggplot2)
+library(gridExtra)
+
+gconst <- factor(rep(1:2, each = 4))
+poss_seqs <- sample(c(0,1), size = 8, replace = TRUE)
+
+rand_tile <- function(seed=1,num=1){set.seed(seed)
+  data.frame(x = sample(c(0,1), size = 8, replace = TRUE),
+         y = sample(c(0,1), size = 8, replace = TRUE),
+         g = factor(rep(1:2, each = 4)),
+         title = paste0("tile",num))}
+
+
+theme_set(theme_void() + theme(legend.position = "none"))
+
+plot_tile <- function(dat){
+  ggplot(dat, aes(x, y)) +
+    geom_polygon(aes(group = paste(title, g), fill = g), 
+                 color = sample(c("#9B5DE5","#F15BB5","#FEE440","#00BBF9","#00F5D4"),1), 
+                 linewidth = 1) + 
+    coord_equal() + 
+    ## sample two colors randomly
+    #scale_fill_manual(values = sample(colors(), 2))
+    scale_fill_manual(values = sample(c("#9B5DE5","#F15BB5","#FEE440","#00BBF9","#00F5D4"),2))
+}
+
+
+
+many_rows <- 8
+many_cols <- 8
+
+accum <- list()
+for(i in 1:(many_rows*many_cols)){accum[[i]] <- plot_tile(rand_tile(i,i))}
+
+do.call(grid.arrange, accum) 
+```
+
+
